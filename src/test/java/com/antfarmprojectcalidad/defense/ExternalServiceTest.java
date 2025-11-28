@@ -51,10 +51,10 @@ public class ExternalServiceTest {
         );
 
         String baseUrl = mockWebServer.url("/").toString();
-        ExternalService service = new ExternalService(baseUrl);
+        ExternalService service = new ExternalService();
 
         // Act
-        List<Threat> result = service.getActiveThreats(); // still minimal implementation, so test fails
+        List<Threat> result = service.getActiveThreats(baseUrl); // still minimal implementation, so test fails
 
         // Assert — should return one threat from API
         assertEquals(1, result.size());

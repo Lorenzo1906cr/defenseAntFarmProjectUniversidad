@@ -16,16 +16,14 @@ import java.util.Objects;
 @Service
 public class ExternalService {
     private String lastValue = null;
-    private final String baseUrl;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ExternalService(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public ExternalService() {
         this.httpClient = HttpClient.newHttpClient();
     }
 
-    public List<Threat> getActiveThreats() {
+    public List<Threat> getActiveThreats(String baseUrl) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(baseUrl + "threats"))

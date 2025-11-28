@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="57974449-5104-4581-8029-392463d12a38" name="Changes" comment="ExternalService test red">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/antfarmprojectcalidad/defense/model/Threat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/antfarmprojectcalidad/defense/model/Threat.java" afterDir="false" />
+    <list default="true" id="57974449-5104-4581-8029-392463d12a38" name="Changes" comment="ExternalService test green">
       <change beforePath="$PROJECT_DIR$/src/main/java/com/antfarmprojectcalidad/defense/service/ExternalService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/antfarmprojectcalidad/defense/service/ExternalService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/antfarmprojectcalidad/defense/service/ExternalService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/antfarmprojectcalidad/defense/service/ExternalService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/antfarmprojectcalidad/defense/ExternalServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/antfarmprojectcalidad/defense/ExternalServiceTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,7 +145,7 @@
       <workItem from="1764287986690" duration="690000" />
       <workItem from="1764288713146" duration="904000" />
       <workItem from="1764289649159" duration="768000" />
-      <workItem from="1764296156347" duration="49000" />
+      <workItem from="1764296156347" duration="355000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -173,7 +171,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764295801872</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="ExternalService test green">
+      <option name="closed" value="true" />
+      <created>1764296279761</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1764296279761</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -206,6 +212,7 @@
     <MESSAGE value="Initial commit" />
     <MESSAGE value="ExternalService failed" />
     <MESSAGE value="ExternalService test red" />
-    <option name="LAST_COMMIT_MESSAGE" value="ExternalService test red" />
+    <MESSAGE value="ExternalService test green" />
+    <option name="LAST_COMMIT_MESSAGE" value="ExternalService test green" />
   </component>
 </project>
