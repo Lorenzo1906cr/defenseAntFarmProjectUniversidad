@@ -1,63 +1,73 @@
-package com.antfarmprojectcalidad.defense;
+package com.antfarmprojectcalidad.defense.service;
 
 import com.antfarmprojectcalidad.defense.model.Threat;
-import com.antfarmprojectcalidad.defense.service.ExternalService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
 
+import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
+@ContextConfiguration(initializers = ExternalServiceTest.MockServerInitializer.class)
 public class ExternalServiceTest {
-    private MockWebServer mockWebServer;
 
-    @BeforeEach
-    void setUp() throws Exception {
+    private static MockWebServer mockWebServer;
+
+    @Autowired
+    private ExternalService externalService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @BeforeAll
+    static void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
     }
 
-    @AfterEach
-    void tearDown() throws Exception {
+    @AfterAll
+    static void tearDown() throws IOException {
         mockWebServer.shutdown();
     }
 
-    @Test
-    void shouldFetchThreatsFromApi() throws Exception {
-        // Arrange: fake JSON response
-        String json = """
-                [
-                  {
-                    "id": 1,
-                    "zona_id": 1,
-                    "nombre": "Spider",
-                    "tipo": "ARANA",
-                    "costo_hormigas": 3,
-                    "estado": "activa",
-                    "hora_deteccion": "2025-11-25T21:55:34",
-                    "hora_resolucion": null
-                  }
-                ]
-                """;
+    static class MockServerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        @Override
+        public void initialize(ConfigurableApplicationContext ctx) {
+            TestPropertyValues.of(
+                    "url.entorno=http://localhost:" + mockWebServer.getPort()
+            ).applyTo(ctx.getEnvironment());
+        }
+    }
 
-        mockWebServer.enqueue(
-                new MockResponse()
-                        .setBody(json)
-                        .addHeader("Content-Type", "application/json")
+    @Test
+    void testGetActiveThreats() throws Exception {
+
+        // Prepare a mock JSON response
+        List<Threat> mockThreats = List.of(
+                new Threat(1, "Amenaza 1", "activa"),
+                new Threat(2, "Amenaza 2", "inactiva")
         );
 
-        String baseUrl = mockWebServer.url("/").toString();
-        ExternalService service = new ExternalService(baseUrl);
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(objectMapper.writeValueAsString(mockThreats))
+                .addHeader("Content-Type", "application/json"));
 
-        // Act
-        List<Threat> result = service.getActiveThreats(); // still minimal implementation, so test fails
+        List<Threat> result = externalService.getActiveThreats();
 
-        // Assert — should return one threat from API
-        assertEquals(1, result.size());
-        assertEquals("Spider", result.get(0).getNombre());
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getNombre()).isEqualTo("Amenaza 1");
+        assertThat(result.get(1).getNombre()).isEqualTo("Amenaza 2");
     }
 }

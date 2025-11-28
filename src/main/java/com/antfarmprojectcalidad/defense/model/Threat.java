@@ -8,6 +8,12 @@ public class Threat {
     private String estado;
     private String nombre;
 
+    public Threat(int id, String nombre, String estado) {
+        this.id = id;
+        this.estado = estado;
+        this.nombre = nombre;
+    }
+
     public int getId() {
         return id;
     }
