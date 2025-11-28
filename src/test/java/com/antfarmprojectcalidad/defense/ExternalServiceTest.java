@@ -1,76 +1,74 @@
 package com.antfarmprojectcalidad.defense.service;
 
 import com.antfarmprojectcalidad.defense.model.Threat;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ContextConfiguration(initializers = ExternalServiceTest.MockServerInitializer.class)
-public class ExternalServiceTest {
+class ExternalServiceTest {
 
-    private static MockWebServer mockWebServer;
-
-    @Autowired
+    private MockWebServer mockWebServer;
     private ExternalService externalService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @BeforeAll
-    static void setUp() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
+
+        String baseUrl = mockWebServer.url("/").toString();
+
+        WebClient webClient = WebClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+
+        externalService = new ExternalService(baseUrl, webClient);
     }
 
-    @AfterAll
-    static void tearDown() throws IOException {
+    @AfterEach
+    void tearDown() throws IOException {
         mockWebServer.shutdown();
     }
 
-    static class MockServerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        @Override
-        public void initialize(ConfigurableApplicationContext ctx) {
-            TestPropertyValues.of(
-                    "url.entorno=http://localhost:" + mockWebServer.getPort()
-            ).applyTo(ctx.getEnvironment());
-        }
-    }
-
     @Test
-    void testGetActiveThreats() throws Exception {
-
-        // Prepare a mock JSON response
-        List<Threat> mockThreats = List.of(
-                new Threat(1, "Amenaza 1", "activa"),
-                new Threat(2, "Amenaza 2", "inactiva")
-        );
-
+    void getActiveThreats_returnsEmptyList_initially() {
+        // No response from server: default empty response
         mockWebServer.enqueue(new MockResponse()
-                .setBody(objectMapper.writeValueAsString(mockThreats))
+                .setBody("[]")
                 .addHeader("Content-Type", "application/json"));
 
         List<Threat> result = externalService.getActiveThreats();
 
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).getNombre()).isEqualTo("Amenaza 1");
-        assertThat(result.get(1).getNombre()).isEqualTo("Amenaza 2");
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getActiveThreats_returnsMappedThreats() {
+        String body = """
+            [
+                { "id": 1, "nombre": "Amenaza A", "estado": "activa" },
+                { "id": 2, "nombre": "Amenaza B", "estado": "activa" }
+            ]
+            """;
+
+        mockWebServer.enqueue(new MockResponse()
+                .setBody(body)
+                .addHeader("Content-Type", "application/json"));
+
+        List<Threat> result = externalService.getActiveThreats();
+
+        assertEquals(2, result.size());
+        assertEquals(1, result.get(0).getId());
+        assertEquals("Amenaza A", result.get(0).getNombre());
+        assertEquals("activa", result.get(0).getEstado());
     }
 
     @Test
@@ -78,8 +76,7 @@ public class ExternalServiceTest {
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(500)
                 .setBody("{\"error\": \"internal\"}")
-                .addHeader("Content-Type", "application/json")
-        );
+                .addHeader("Content-Type", "application/json"));
 
         List<Threat> threats = externalService.getActiveThreats();
 
@@ -88,10 +85,11 @@ public class ExternalServiceTest {
     }
 
     @Test
-    void getActiveThreats_returnsEmptyList_whenTimeoutOrDisconnect() {
-        mockWebServer.enqueue(new MockResponse()
-                .setBodyDelay(5, java.util.concurrent.TimeUnit.SECONDS) // genera timeout
-                .setBody("[]")
+    void getActiveThreats_returnsEmptyList_whenTimeout() {
+        mockWebServer.enqueue(
+                new MockResponse()
+                        .setBody("[]")
+                        .setBodyDelay(5, java.util.concurrent.TimeUnit.SECONDS)
         );
 
         List<Threat> threats = externalService.getActiveThreats();
@@ -104,8 +102,7 @@ public class ExternalServiceTest {
     void getActiveThreats_returnsEmptyList_whenInvalidJson() {
         mockWebServer.enqueue(new MockResponse()
                 .setBody("{ invalid json }")
-                .addHeader("Content-Type", "application/json")
-        );
+                .addHeader("Content-Type", "application/json"));
 
         List<Threat> threats = externalService.getActiveThreats();
 
