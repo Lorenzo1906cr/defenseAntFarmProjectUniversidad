@@ -1,5 +1,8 @@
 package com.antfarmprojectcalidad.defense.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Threat {
     private int id;
     private String estado;
