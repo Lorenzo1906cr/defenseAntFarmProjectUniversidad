@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="57974449-5104-4581-8029-392463d12a38" name="Changes" comment="Initial commit" />
+    <list default="true" id="57974449-5104-4581-8029-392463d12a38" name="Changes" comment="Initial commit">
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -28,18 +30,18 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "lrodriguezv-m"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;lrodriguezv-m&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Lorenzo1906cr/defenseAntFarmProjectUniversidad",
-    "accountId": "3cf12131-87bd-491f-b5b7-945d66b4b505"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Lorenzo1906cr/defenseAntFarmProjectUniversidad&quot;,
+    &quot;accountId&quot;: &quot;3cf12131-87bd-491f-b5b7-945d66b4b505&quot;
   }
-}]]></component>
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -63,6 +65,7 @@
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.DefenseApplication.executor": "Run",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/lorenzorodriguez/Documents/Cenfotec/Repo/defenseAntFarmProjectUniversidad",
@@ -100,6 +103,7 @@
       <updated>1764287985547</updated>
       <workItem from="1764287986690" duration="690000" />
       <workItem from="1764288713146" duration="904000" />
+      <workItem from="1764289649159" duration="768000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -109,7 +113,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764289056101</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Initial commit">
+      <option name="closed" value="true" />
+      <created>1764289711349</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1764289711349</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
