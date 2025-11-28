@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class ExternalServiceConfig {
     @Bean
     public ExternalService externalService(
-            @Value("${url.entorno}") String entornoUrl
+            @Value("${url.entorno.threats}") String entornoUrl
     ) {
         return new ExternalService(entornoUrl);
     }

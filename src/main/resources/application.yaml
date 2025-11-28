@@ -2,4 +2,5 @@ spring:
   application:
     name: defense
 url:
- entorno: 'http://example.com'
+ entorno:
+   threats: 'https://proyecto-final-entorno.onrender.com/threats'

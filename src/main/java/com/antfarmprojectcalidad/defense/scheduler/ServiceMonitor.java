@@ -21,7 +21,7 @@ public class ServiceMonitor {
         List<Threat> threats = externalService.getActiveThreats();
 
         for (Threat threat : threats) {
-            //Check threat
+            System.out.println(threat.getId());
         }
     }
 }

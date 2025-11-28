@@ -4,10 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="57974449-5104-4581-8029-392463d12a38" name="Changes" comment="ExternalService refactor green">
+    <list default="true" id="57974449-5104-4581-8029-392463d12a38" name="Changes" comment="ServiceMonitorTest test green">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/antfarmprojectcalidad/defense/model/Threat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/antfarmprojectcalidad/defense/model/Threat.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/antfarmprojectcalidad/defense/ExternalServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/antfarmprojectcalidad/defense/ExternalServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/antfarmprojectcalidad/defense/scheduler/ServiceMonitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/antfarmprojectcalidad/defense/scheduler/ServiceMonitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/antfarmprojectcalidad/defense/service/ExternalService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/antfarmprojectcalidad/defense/service/ExternalService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/antfarmprojectcalidad/defense/scheduler/ServiceMonitor.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/antfarmprojectcalidad/defense/scheduler/ServiceMonitor.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/antfarmprojectcalidad/defense/service/ExternalService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/antfarmprojectcalidad/defense/service/ExternalService.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,8 +66,11 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;JUnit.ExternalServiceTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ExternalServiceTest.getActiveThreats_returnsOnlyActiva.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ExternalServiceTest.shouldFetchThreatsFromApi.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ExternalServiceTest.testGetActiveThreats.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ServiceMonitorTest.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
     &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
@@ -145,6 +153,21 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="ServiceMonitorTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="defense" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.antfarmprojectcalidad.defense.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.antfarmprojectcalidad.defense" />
+      <option name="MAIN_CLASS_NAME" value="com.antfarmprojectcalidad.defense.ServiceMonitorTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="DefenseApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="defense" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.antfarmprojectcalidad.defense.DefenseApplication" />
@@ -155,6 +178,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.ExternalServiceTest" />
+        <item itemvalue="JUnit.ServiceMonitorTest" />
         <item itemvalue="JUnit.ExternalServiceTest.testGetActiveThreats" />
         <item itemvalue="JUnit.ExternalServiceTest.shouldFetchThreatsFromApi" />
         <item itemvalue="JUnit.ExternalServiceTest.shouldReturnOnlyActiveThreats" />
@@ -179,7 +203,8 @@
       <workItem from="1764287986690" duration="690000" />
       <workItem from="1764288713146" duration="904000" />
       <workItem from="1764289649159" duration="768000" />
-      <workItem from="1764296156347" duration="1461000" />
+      <workItem from="1764296156347" duration="3270000" />
+      <workItem from="1764300240943" duration="534000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -229,7 +254,47 @@
       <option name="project" value="LOCAL" />
       <updated>1764297462948</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="ExternalService refactor green">
+      <option name="closed" value="true" />
+      <created>1764297752298</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1764297752298</updated>
+    </task>
+    <task id="LOCAL-00008" summary="ExternalService test red">
+      <option name="closed" value="true" />
+      <created>1764297850129</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1764297850129</updated>
+    </task>
+    <task id="LOCAL-00009" summary="ExternalService test green">
+      <option name="closed" value="true" />
+      <created>1764298247628</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1764298247628</updated>
+    </task>
+    <task id="LOCAL-00010" summary="ServiceMonitorTest test red">
+      <option name="closed" value="true" />
+      <created>1764298694212</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1764298694212</updated>
+    </task>
+    <task id="LOCAL-00011" summary="ServiceMonitorTest test green">
+      <option name="closed" value="true" />
+      <created>1764298762889</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1764298762889</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -261,9 +326,11 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial commit" />
     <MESSAGE value="ExternalService failed" />
+    <MESSAGE value="ExternalService refactor green" />
     <MESSAGE value="ExternalService test red" />
     <MESSAGE value="ExternalService test green" />
-    <MESSAGE value="ExternalService refactor green" />
-    <option name="LAST_COMMIT_MESSAGE" value="ExternalService refactor green" />
+    <MESSAGE value="ServiceMonitorTest test red" />
+    <MESSAGE value="ServiceMonitorTest test green" />
+    <option name="LAST_COMMIT_MESSAGE" value="ServiceMonitorTest test green" />
   </component>
 </project>
