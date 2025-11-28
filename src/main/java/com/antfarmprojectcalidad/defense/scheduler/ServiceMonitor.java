@@ -1,8 +1,11 @@
 package com.antfarmprojectcalidad.defense.scheduler;
 
+import com.antfarmprojectcalidad.defense.model.Threat;
 import com.antfarmprojectcalidad.defense.service.ExternalService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class ServiceMonitor {
@@ -15,11 +18,10 @@ public class ServiceMonitor {
     // Runs every 10 seconds
     @Scheduled(fixedRate = 10000)
     public void checkForUpdates() {
-        boolean changed = externalService.hasChanged();
+        List<Threat> threats = externalService.getActiveThreats();
 
-        if (changed) {
-            System.out.println("Change detected!");
-            // Do something: update cache, send event, log, etc.
+        for (Threat threat : threats) {
+            //Check threat
         }
     }
 }

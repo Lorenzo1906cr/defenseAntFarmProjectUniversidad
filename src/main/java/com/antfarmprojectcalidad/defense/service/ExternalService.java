@@ -50,18 +50,4 @@ public class ExternalService {
             return Collections.emptyList();
         }
     }
-
-    public boolean hasChanged() {
-        // Example: call external API
-        String newValue = callExternalService();
-
-        boolean changed = !Objects.equals(newValue, lastValue);
-        lastValue = newValue;
-        return changed;
-    }
-
-    private String callExternalService() {
-        // TODO: use WebClient, HttpURLConnection, or RestTemplate
-        return "example";
-    }
 }
