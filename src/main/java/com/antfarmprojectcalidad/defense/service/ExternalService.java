@@ -1,7 +1,9 @@
 package com.antfarmprojectcalidad.defense.service;
 
+import com.antfarmprojectcalidad.defense.model.Threat;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -20,5 +22,9 @@ public class ExternalService {
     private String callExternalService() {
         // TODO: use WebClient, HttpURLConnection, or RestTemplate
         return "example";
+    }
+
+    public List<Threat> getActiveThreats() {
+        return null;
     }
 }
