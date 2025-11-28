@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ContextConfiguration(initializers = ExternalServiceTest.MockServerInitializer.class)
@@ -69,5 +71,45 @@ public class ExternalServiceTest {
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getNombre()).isEqualTo("Amenaza 1");
         assertThat(result.get(1).getNombre()).isEqualTo("Amenaza 2");
+    }
+
+    @Test
+    void getActiveThreats_returnsEmptyList_whenServerError() {
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("{\"error\": \"internal\"}")
+                .addHeader("Content-Type", "application/json")
+        );
+
+        List<Threat> threats = externalService.getActiveThreats();
+
+        assertNotNull(threats);
+        assertTrue(threats.isEmpty());
+    }
+
+    @Test
+    void getActiveThreats_returnsEmptyList_whenTimeoutOrDisconnect() {
+        mockWebServer.enqueue(new MockResponse()
+                .setBodyDelay(5, java.util.concurrent.TimeUnit.SECONDS) // genera timeout
+                .setBody("[]")
+        );
+
+        List<Threat> threats = externalService.getActiveThreats();
+
+        assertNotNull(threats);
+        assertTrue(threats.isEmpty());
+    }
+
+    @Test
+    void getActiveThreats_returnsEmptyList_whenInvalidJson() {
+        mockWebServer.enqueue(new MockResponse()
+                .setBody("{ invalid json }")
+                .addHeader("Content-Type", "application/json")
+        );
+
+        List<Threat> threats = externalService.getActiveThreats();
+
+        assertNotNull(threats);
+        assertTrue(threats.isEmpty());
     }
 }
