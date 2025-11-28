@@ -1,3 +1,5 @@
 spring:
   application:
     name: defense
+url:
+ entorno: 'http://example.com'

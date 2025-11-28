@@ -4,6 +4,7 @@ import com.antfarmprojectcalidad.defense.model.Threat;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 
 import java.net.URI;
@@ -16,33 +17,27 @@ import java.util.Objects;
 @Service
 public class ExternalService {
     private String lastValue = null;
-    private final HttpClient httpClient;
+    private String entornoUrl;
+    private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ExternalService() {
-        this.httpClient = HttpClient.newHttpClient();
+    public ExternalService(String entornoUrl) {
+        this.webClient = WebClient.create();
+        this.entornoUrl = entornoUrl;
     }
 
-    public List<Threat> getActiveThreats(String baseUrl) {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(baseUrl + "threats"))
-                    .GET()
-                    .build();
+    public ExternalService(String entornoUrl, WebClient webClient) {
+        this.entornoUrl = entornoUrl;
+        this.webClient = webClient;
+    }
 
-            HttpResponse<String> response = httpClient.send(
-                    request,
-                    HttpResponse.BodyHandlers.ofString()
-            );
-
-            return objectMapper.readValue(
-                    response.body(),
-                    new TypeReference<>() {}
-            );
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to call external API", e);
-        }
+    public List<Threat> getActiveThreats() {
+        return webClient.get()
+                .uri(entornoUrl + "/threats")
+                .retrieve()
+                .bodyToFlux(Threat.class)
+                .collectList()
+                .block();
     }
 
     public boolean hasChanged() {
