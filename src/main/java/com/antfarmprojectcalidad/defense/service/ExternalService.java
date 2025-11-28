@@ -28,7 +28,6 @@ public class ExternalService {
 
     public List<Threat> getActiveThreats() {
         try {
-            System.out.println(entornoUrl);
             return webClient.get()
                     .uri(entornoUrl)
                     .retrieve()

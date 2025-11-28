@@ -21,7 +21,16 @@ public class ServiceMonitor {
         List<Threat> threats = externalService.getActiveThreats();
 
         for (Threat threat : threats) {
-            System.out.println(threat.getId());
+            Thread thread = createThread(threat);
+            thread.start();
         }
+    }
+
+    public Thread createThread(Threat threat) {
+        return new Thread(() -> handleThreat(threat));
+    }
+
+    public void handleThreat(Threat threat) {
+        System.out.println("Processing threat: " + threat.getId());
     }
 }
