@@ -3,4 +3,6 @@ spring:
     name: defense
 url:
  entorno:
-   threats: 'https://proyecto-final-entorno.onrender.com/threats'
+  threats: 'https://proyecto-final-entorno.onrender.com/threats'
+ comm:
+  message: 'https://proyecto-final-entorno.onrender.com/threats'

@@ -18,9 +18,11 @@ public class ServiceMonitor {
     // Runs every 10 seconds
     @Scheduled(fixedRate = 10000)
     public void checkForUpdates() {
+        System.out.println("Getting updates from external service");
         List<Threat> threats = externalService.getActiveThreats();
 
         for (Threat threat : threats) {
+            System.out.println("Processing threat outside: " + threat.getId());
             Thread thread = createThread(threat);
             thread.start();
         }
