@@ -10,11 +10,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class ServiceMonitorTest {
@@ -26,6 +26,11 @@ public class ServiceMonitorTest {
     void setUp() {
         externalService = mock(ExternalService.class);
         communicationService = mock(CommunicationService.class);
+
+        ServiceMonitor.antFarmInDanger.set(false);
+        ServiceMonitor.threats.clear();
+        ServiceMonitor.threatsWaitingForAnts.clear();
+
         serviceMonitor = new ServiceMonitor(externalService, communicationService);
     }
 
@@ -94,5 +99,29 @@ public class ServiceMonitorTest {
         assertEquals(1, inner.get("request_ref"));
         assertEquals(123, inner.get("threat_id"));
         assertEquals("5", inner.get("ants_needed"));
+    }
+
+    @Test
+    void testCheckForUpdatesPopulatesMapsAndDangerFlag() {
+        Threat threat = new Threat();
+        threat.setId(101);
+        threat.setCosto_hormigas("5");
+
+        when(externalService.getActiveThreats()).thenReturn(Collections.singletonList(threat));
+
+        MensajeResponse response = new MensajeResponse();
+        response.setMensaje("Mensaje creado con éxito");
+        response.setId("msg-123");
+
+        when(communicationService.enviarMensaje(any())).thenReturn(response);
+
+        serviceMonitor.checkForUpdates();
+
+        assertTrue(ServiceMonitor.antFarmInDanger.get(), "antFarmInDanger should be TRUE since 1 threat exists");
+        assertEquals(1, ServiceMonitor.threats.size(), "threats map should contain the threat");
+        assertTrue(ServiceMonitor.threats.containsKey(101), "Threat ID 101 must be stored");
+        assertEquals(1, ServiceMonitor.threatsWaitingForAnts.size(), "threatsWaitingForAnts must contain the threat");
+
+        verify(communicationService, times(1)).enviarMensaje(any());
     }
 }

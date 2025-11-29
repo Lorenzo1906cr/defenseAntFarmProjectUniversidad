@@ -9,6 +9,8 @@ public class Threat {
     private String nombre;
     private String costo_hormigas;
 
+    public Threat() {}
+
     public Threat(int id, String nombre, String estado) {
         this.id = id;
         this.estado = estado;
