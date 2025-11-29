@@ -6,6 +6,7 @@ import com.antfarmprojectcalidad.defense.service.CommunicationService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.Mockito.*;
@@ -78,27 +79,41 @@ public class CommunicationServiceTest {
         String receptor = "S05_DEF";
         String expectedUrl = URL + "/api/mensaje?receptor=" + receptor;
 
-        WebClient.RequestHeadersUriSpec getSpec = mock(WebClient.RequestHeadersUriSpec.class);
-        when(webClient.get()).thenReturn(getSpec);
-        when(getSpec.uri(expectedUrl)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+        WebClient.RequestHeadersUriSpec<?> getSpec = mock(WebClient.RequestHeadersUriSpec.class);
+        WebClient.RequestHeadersSpec<?> getRequestSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.ResponseSpec getResponseSpec = mock(WebClient.ResponseSpec.class);
 
-        MensajeResponse mockResponse = new MensajeResponse();
-        mockResponse.setMensaje("asignacion_hormigas");
-        mockResponse.setTimestamp("2025-10-08T17:20:00Z");
-        mockResponse.setTtl(60000);
+        doReturn(getSpec).when(webClient).get();
+        doReturn(getRequestSpec).when(getSpec).uri(expectedUrl);
+        doReturn(getResponseSpec).when(getRequestSpec).retrieve();
 
-        when(responseSpec.bodyToMono(MensajeResponse.class)).thenReturn(Mono.just(mockResponse));
+        doReturn(getResponseSpec).when(getResponseSpec).onStatus(any(), any());
+        doReturn(getResponseSpec).when(getResponseSpec).onStatus(any(), any());
 
-        MensajeResponse response = communicationService.obtenerMensaje(receptor);
+        String jsonResponse = """
+        [
+            {
+                "id": "msg-002",
+                "mensaje": "asignacion_hormigas",
+                "timestamp": "2025-10-08T17:20:00Z",
+                "ttl": 60000
+            }
+        ]
+        """;
 
-        assertNotNull(response);
-        assertEquals("asignacion_hormigas", response.getMensaje());
+        doReturn(Mono.just(jsonResponse))
+                .when(getResponseSpec)
+                .bodyToMono(String.class);
+
+        var result = communicationService.obtenerMensaje(receptor);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("asignacion_hormigas", result.get(0).getMensaje());
 
         verify(webClient).get();
         verify(getSpec).uri(expectedUrl);
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).bodyToMono(MensajeResponse.class);
+        verify(getRequestSpec).retrieve();
+        verify(getResponseSpec).bodyToMono(String.class);
     }
 }
