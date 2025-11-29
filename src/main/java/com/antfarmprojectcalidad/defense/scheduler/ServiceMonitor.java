@@ -8,12 +8,15 @@ import com.antfarmprojectcalidad.defense.service.ExternalService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class ServiceMonitor {
+    public static final AtomicBoolean antFarmInDanger = new AtomicBoolean(false);
+    public static final Map<Integer, Threat> threats = new ConcurrentHashMap<>();
+
     private final ExternalService externalService;
     private final CommunicationService communicationService;
 
@@ -26,12 +29,18 @@ public class ServiceMonitor {
     @Scheduled(fixedRate = 10000)
     public void checkForUpdates() {
         System.out.println("Getting updates from external service");
-        List<Threat> threats = externalService.getActiveThreats();
+        List<Threat> threatsNew = externalService.getActiveThreats();
 
-        for (Threat threat : threats) {
-            System.out.println("Processing threat outside: " + threat.getId());
-            Thread thread = createThread(threat);
-            thread.start();
+        for (Threat threat : threatsNew) {
+            if (!threats.containsKey(threat.getId())) {
+                handleThreat(threat);
+                threats.put(threat.getId(), threat);
+            }
+
+
+            //System.out.println("Processing threat outside: " + threat.getId());
+            //Thread thread = createThread(threat);
+            //thread.start();
         }
     }
 
@@ -42,11 +51,17 @@ public class ServiceMonitor {
     public void handleThreat(Threat threat) {
         System.out.println("Processing threat: " + threat.getId());
 
+        boolean antsAssigned = false;
+        MensajeResponse response = requestSupport(threat);
 
-
-        //if ("Mensaje creado con éxito".equalsIgnoreCase(response.getMensaje())) {
-
-        //}
+        if ("Mensaje creado con éxito".equalsIgnoreCase(response.getMensaje())) {
+            while (antsAssigned) {
+                //check messages
+                //if messages sent
+                //defend colony
+                //else wait 2 seconds
+            }
+        }
     }
 
     public MensajeResponse requestSupport(Threat threat) {

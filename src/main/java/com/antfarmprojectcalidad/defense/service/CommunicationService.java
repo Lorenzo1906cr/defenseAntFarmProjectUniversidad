@@ -41,4 +41,21 @@ public class CommunicationService {
             return new MensajeResponse();
         }
     }
+
+    public MensajeResponse obtenerMensaje(String receptor) {
+        try {
+            return webClient.get()
+                    .uri(commUrl + "/api/mensaje?receptor=" + receptor)
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::isError,
+                            response -> Mono.error(new RuntimeException("API error"))
+                    )
+                    .bodyToMono(MensajeResponse.class)
+                    .onErrorReturn(new MensajeResponse())
+                    .block();
+        } catch (Exception e) {
+            return new MensajeResponse();
+        }
+    }
 }
