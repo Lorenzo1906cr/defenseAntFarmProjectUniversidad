@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ServiceMonitor {
     public static final AtomicBoolean antFarmInDanger = new AtomicBoolean(false);
     public static final Map<Integer, Threat> threats = new ConcurrentHashMap<>();
+    public static final Map<Integer, Threat> threatsWaitingForAnts = new ConcurrentHashMap<>();
 
     private final ExternalService externalService;
     private final CommunicationService communicationService;
@@ -42,6 +43,10 @@ public class ServiceMonitor {
             //Thread thread = createThread(threat);
             //thread.start();
         }
+
+        if (!threats.isEmpty()) {
+            antFarmInDanger.set(true);
+        }
     }
 
     public Thread createThread(Threat threat) {
@@ -51,16 +56,9 @@ public class ServiceMonitor {
     public void handleThreat(Threat threat) {
         System.out.println("Processing threat: " + threat.getId());
 
-        boolean antsAssigned = false;
         MensajeResponse response = requestSupport(threat);
-
         if ("Mensaje creado con éxito".equalsIgnoreCase(response.getMensaje())) {
-            while (antsAssigned) {
-                //check messages
-                //if messages sent
-                //defend colony
-                //else wait 2 seconds
-            }
+            threatsWaitingForAnts.put(threat.getId(), threat);
         }
     }
 
