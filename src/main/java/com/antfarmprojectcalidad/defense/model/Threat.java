@@ -7,6 +7,7 @@ public class Threat {
     private int id;
     private String estado;
     private String nombre;
+    private String costo_hormigas;
 
     public Threat(int id, String nombre, String estado) {
         this.id = id;
@@ -36,5 +37,13 @@ public class Threat {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getCosto_hormigas() {
+        return costo_hormigas;
+    }
+
+    public void setCosto_hormigas(String costo_hormigas) {
+        this.costo_hormigas = costo_hormigas;
     }
 }
