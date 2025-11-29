@@ -19,12 +19,13 @@ import static org.mockito.Mockito.*;
 
 public class ServiceMonitorTest {
     private ExternalService externalService;
+    private CommunicationService communicationService;
     private ServiceMonitor serviceMonitor;
 
     @BeforeEach
     void setUp() {
         externalService = mock(ExternalService.class);
-        CommunicationService communicationService = mock(CommunicationService.class);
+        communicationService = mock(CommunicationService.class);
         serviceMonitor = new ServiceMonitor(externalService, communicationService);
     }
 
@@ -32,6 +33,11 @@ public class ServiceMonitorTest {
     void checkForUpdates_callsExternalServiceAndIterates() {
         Threat t1 = new Threat(1, "Threat A", "activa");
         Threat t2 = new Threat(2, "Threat B", "inactiva");
+
+        MensajeResponse fakeResponse = new MensajeResponse();
+        fakeResponse.setId("RESP-555");
+        when(communicationService.enviarMensaje(any(MensajeRequest.class)))
+                .thenReturn(fakeResponse);
 
         when(externalService.getActiveThreats())
                 .thenReturn(List.of(t1, t2));
