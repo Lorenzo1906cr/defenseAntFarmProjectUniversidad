@@ -72,4 +72,33 @@ public class CommunicationServiceTest {
         verify(requestHeadersSpec).retrieve();
         verify(responseSpec).bodyToMono(MensajeResponse.class);
     }
+
+    @Test
+    void testObtenerMensaje() {
+        String receptor = "S05_DEF";
+        String expectedUrl = URL + "/api/mensaje?receptor=" + receptor;
+
+        WebClient.RequestHeadersUriSpec getSpec = mock(WebClient.RequestHeadersUriSpec.class);
+        when(webClient.get()).thenReturn(getSpec);
+        when(getSpec.uri(expectedUrl)).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+
+        MensajeResponse mockResponse = new MensajeResponse();
+        mockResponse.setMensaje("asignacion_hormigas");
+        mockResponse.setTimestamp("2025-10-08T17:20:00Z");
+        mockResponse.setTtl(60000);
+
+        when(responseSpec.bodyToMono(MensajeResponse.class)).thenReturn(Mono.just(mockResponse));
+
+        MensajeResponse response = communicationService.obtenerMensaje(receptor);
+
+        assertNotNull(response);
+        assertEquals("asignacion_hormigas", response.getMensaje());
+
+        verify(webClient).get();
+        verify(getSpec).uri(expectedUrl);
+        verify(requestHeadersSpec).retrieve();
+        verify(responseSpec).bodyToMono(MensajeResponse.class);
+    }
 }
