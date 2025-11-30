@@ -167,5 +167,27 @@ public class ServiceMonitorTest {
         );
     }
 
+    @Test
+    void checkIncomingMessages_processesRechazoMessage() throws Exception {
+        ExternalService external = mock(ExternalService.class);
+        CommunicationService comm = mock(CommunicationService.class);
+
+        ServiceMonitor monitor = spy(new ServiceMonitor(external, comm));
+
+        MensajeResponse msg = new MensajeResponse();
+        msg.setMensaje("""
+            { "tipo": "rechazo_hormigas",
+              "contenido": { "request_ref": "req-1", "motivo": "insuficientes" }}
+            """);
+
+        when(comm.obtenerMensaje("S05_DEF")).thenReturn(List.of(msg));
+
+        monitor.checkIncomingMessages();
+
+        assertEquals(
+                List.of("rechazo_hormigas"),
+                monitor.getProcessedTypesForTest()
+        );
+    }
 }
 
