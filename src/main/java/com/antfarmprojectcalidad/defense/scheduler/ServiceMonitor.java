@@ -83,5 +83,5 @@ public class ServiceMonitor {
         return response;
     }
 
-    List<String> getProcessedTypesForTest() { return processedTypes; }
+    public List<String> getProcessedTypesForTest() { return processedTypes; }
 }
