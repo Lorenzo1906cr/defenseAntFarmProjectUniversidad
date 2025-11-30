@@ -113,10 +113,18 @@ public class ServiceMonitor {
             if (time != null && time.isBefore(Instant.now().minus(minutes))) {
                 Threat threat = threats.get(id);
                 List<Map<String, Object>> ants = (List<Map<String, Object>>) antsDefending.get(id);
+                List<Map<String, Object>> survAnts = new ArrayList<>();
 
-                //Send message to entorno
-                //Send message to hormiga reina
-                onDefenseExpired(id, threat, ants);
+                for (Map<String, Object> ant : ants) {
+                    boolean randomBool = ThreadLocalRandom.current().nextBoolean();
+                    if (randomBool) {
+                        survAnts.add(ant);
+                    }
+                }
+
+                externalService.deactivateThreat(threat.getId());
+                returnAnts(threat, ants);
+                onDefenseExpired(id, threat, survAnts);
             }
         }
     }
@@ -128,7 +136,8 @@ public class ServiceMonitor {
     }
 
     private void startDying(String requestId) {
-
+        Integer threatId = (Integer) threatRefDictionary.get(requestId);
+        informMuerteHormiguero(threatId);
     }
 
     public void handleThreat(Threat threat, String requestId) {
@@ -148,6 +157,47 @@ public class ServiceMonitor {
         contenido.put("request_ref", requestId);
         contenido.put("threat_id", threat.getId());
         contenido.put("ants_needed", threat.getCosto_hormigas());
+
+        mesaje.put("contenido", contenido);
+
+        MensajeRequest request = new MensajeRequest();
+        request.setEmisor("S05_DEF");
+        request.setReceptor("S03_REI");
+        request.setContenido(mesaje);
+
+        MensajeResponse response = communicationService.enviarMensaje(request);
+        System.out.println("ID recibido: " + response.getId());
+
+        return response;
+    }
+
+    public MensajeResponse returnAnts(Threat threat, List<Map<String, Object>> ants) {
+        Map<String, Object> mesaje = new HashMap<>();
+        mesaje.put("tipo", "resultado_ataque");
+
+        Map<String, Object> contenido = new HashMap<>();
+        contenido.put("threat_id", threat.getId());
+        contenido.put("survivors", threat.getCosto_hormigas());
+
+        mesaje.put("contenido", contenido);
+
+        MensajeRequest request = new MensajeRequest();
+        request.setEmisor("S05_DEF");
+        request.setReceptor("S03_REI");
+        request.setContenido(mesaje);
+
+        MensajeResponse response = communicationService.enviarMensaje(request);
+        System.out.println("ID recibido: " + response.getId());
+
+        return response;
+    }
+
+    public MensajeResponse informMuerteHormiguero(Integer threat) {
+        Map<String, Object> mesaje = new HashMap<>();
+        mesaje.put("tipo", "fin_hormiguero");
+
+        Map<String, Object> contenido = new HashMap<>();
+        contenido.put("threat_id", threat);
 
         mesaje.put("contenido", contenido);
 
