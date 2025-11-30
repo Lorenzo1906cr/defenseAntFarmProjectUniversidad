@@ -52,6 +52,23 @@ public class ServiceMonitor {
         if (mensajes == null || mensajes.isEmpty()) {
             return;
         }
+
+        for (MensajeResponse msg : mensajes) {
+            try {
+                Map<String,Object> root =
+                        new ObjectMapper().readValue(msg.getMensaje(), Map.class);
+
+                String tipo = (String) root.get("tipo");
+                Map<String,Object> contenido = (Map<String,Object>) root.get("contenido");
+
+                if ("asignacion_hormigas".equals(tipo)) {
+                    handler.handleAsignacion(contenido);
+                    continue;
+                }
+
+            } catch (Exception ignored) {}
+        }
+
     }
 
     public void handleThreat(Threat threat) {
