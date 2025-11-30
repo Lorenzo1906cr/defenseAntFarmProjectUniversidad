@@ -58,6 +58,17 @@ public class ServiceMonitor {
             try {
                 root = new ObjectMapper().readValue(json, Map.class);
                 processedTypes.add((String) root.get("tipo"));
+
+                String tipo = (String) root.get("tipo");
+                if ("asignacion_hormigas".equals(tipo)) {
+                    processedTypes.add("asignacion_hormigas");
+                    continue;
+                }
+
+                if ("rechazo_hormigas".equals(tipo)) {
+                    processedTypes.add("rechazo_hormigas");
+                    continue;
+                }
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
