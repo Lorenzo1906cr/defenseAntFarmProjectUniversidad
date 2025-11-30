@@ -45,6 +45,13 @@ public class ServiceMonitor {
         }
     }
 
+    public void checkIncomingMessages() {
+        List<MensajeResponse> mensajes = communicationService.obtenerMensaje("S05_DEF");
+        if (mensajes == null || mensajes.isEmpty()) {
+            return;
+        }
+    }
+
     public void handleThreat(Threat threat) {
         System.out.println("Processing threat: " + threat.getId());
 
