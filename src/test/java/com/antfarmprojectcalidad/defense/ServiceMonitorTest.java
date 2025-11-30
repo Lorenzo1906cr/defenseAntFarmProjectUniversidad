@@ -3,6 +3,7 @@ package com.antfarmprojectcalidad.defense;
 import com.antfarmprojectcalidad.defense.model.MensajeRequest;
 import com.antfarmprojectcalidad.defense.model.MensajeResponse;
 import com.antfarmprojectcalidad.defense.model.Threat;
+import com.antfarmprojectcalidad.defense.scheduler.MessageHandler;
 import com.antfarmprojectcalidad.defense.scheduler.ServiceMonitor;
 import com.antfarmprojectcalidad.defense.service.CommunicationService;
 import com.antfarmprojectcalidad.defense.service.ExternalService;
@@ -26,12 +27,13 @@ public class ServiceMonitorTest {
     void setUp() {
         externalService = mock(ExternalService.class);
         communicationService = mock(CommunicationService.class);
+        MessageHandler handler = mock(MessageHandler.class);
 
         ServiceMonitor.antFarmInDanger.set(false);
         ServiceMonitor.threats.clear();
         ServiceMonitor.threatsWaitingForAnts.clear();
 
-        serviceMonitor = new ServiceMonitor(externalService, communicationService);
+        serviceMonitor = new ServiceMonitor(externalService, communicationService, handler);
     }
 
     @Test
@@ -65,8 +67,9 @@ public class ServiceMonitorTest {
     void testRequestSupport() {
         ExternalService externalService = mock(ExternalService.class);
         CommunicationService communicationService = mock(CommunicationService.class);
+        MessageHandler handler = mock(MessageHandler.class);
 
-        ServiceMonitor monitor = new ServiceMonitor(externalService, communicationService);
+        ServiceMonitor monitor = new ServiceMonitor(externalService, communicationService, handler);
 
         Threat threat = mock(Threat.class);
         when(threat.getId()).thenReturn(123);
@@ -124,4 +127,23 @@ public class ServiceMonitorTest {
 
         verify(communicationService, times(1)).enviarMensaje(any());
     }
+
+    @Test
+    void checkIncomingMessages_noMessages_handlerNotCalled() {
+        CommunicationService cs = mock(CommunicationService.class);
+        ExternalService es = mock(ExternalService.class);
+        MessageHandler handler = mock(MessageHandler.class);
+
+        when(cs.obtenerMensaje("S05_DEF"))
+                .thenReturn(List.of());
+
+        ServiceMonitor monitor = new ServiceMonitor(es, cs, handler);
+
+        monitor.checkIncomingMessages();
+
+        verify(handler, never()).handleAsignacion(any());
+        verify(handler, never()).handleRechazo(any());
+        verify(handler, never()).handleUnknown(any(), any());
+    }
+
 }
