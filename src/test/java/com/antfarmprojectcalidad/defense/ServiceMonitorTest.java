@@ -9,6 +9,7 @@ import com.antfarmprojectcalidad.defense.service.ExternalService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -19,6 +20,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@TestPropertySource(properties = "monitor.minutes=PT1M")
 public class ServiceMonitorTest {
     private ExternalService externalService;
     private CommunicationService communicationService;
@@ -33,6 +35,7 @@ public class ServiceMonitorTest {
         serviceMonitor = new ServiceMonitor(externalService, communicationService);
 
         monitor = new TestableServiceMonitor(externalService, communicationService);
+        monitor.minutes = Duration.ofMinutes(5);
 
         ServiceMonitor.antFarmInDanger.set(false);
         ServiceMonitor.threats.clear();
