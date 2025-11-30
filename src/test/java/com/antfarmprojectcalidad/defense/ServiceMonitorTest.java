@@ -295,5 +295,78 @@ public class ServiceMonitorTest {
             lastExpiredThreatId = threatId;
         }
     }
+
+    @Test
+    void testReturnAnts_sendsCorrectMessage() {
+        ExternalService external = mock(ExternalService.class);
+        CommunicationService comm = mock(CommunicationService.class);
+
+        ServiceMonitor monitor = new ServiceMonitor(external, comm);
+
+        Threat threat = new Threat();
+        threat.setId(77);
+        threat.setCosto_hormigas("10");
+
+        List<Map<String, Object>> ants = List.of(
+                Map.of("id", "A-1"),
+                Map.of("id", "A-2")
+        );
+
+        MensajeResponse fakeResponse = new MensajeResponse();
+        fakeResponse.setId("RESP-999");
+
+        when(comm.enviarMensaje(any(MensajeRequest.class))).thenReturn(fakeResponse);
+
+        MensajeResponse result = monitor.returnAnts(threat, ants);
+
+        assertNotNull(result);
+        assertEquals("RESP-999", result.getId());
+
+        ArgumentCaptor<MensajeRequest> captor = ArgumentCaptor.forClass(MensajeRequest.class);
+        verify(comm, times(1)).enviarMensaje(captor.capture());
+
+        MensajeRequest sent = captor.getValue();
+        assertEquals("S05_DEF", sent.getEmisor());
+        assertEquals("S03_REI", sent.getReceptor());
+
+        Map<String, Object> contenido = sent.getContenido();
+        assertEquals("resultado_ataque", contenido.get("tipo"));
+
+        Map<String, Object> inner = (Map<String, Object>) contenido.get("contenido");
+        assertEquals(77, inner.get("threat_id"));
+        assertEquals("10", inner.get("survivors"));  // same as costo_hormigas
+    }
+
+    @Test
+    void testInformMuerteHormiguero_sendsCorrectMessage() {
+        ExternalService external = mock(ExternalService.class);
+        CommunicationService comm = mock(CommunicationService.class);
+
+        ServiceMonitor monitor = new ServiceMonitor(external, comm);
+
+        MensajeResponse fakeResponse = new MensajeResponse();
+        fakeResponse.setId("RESP-321");
+
+        when(comm.enviarMensaje(any(MensajeRequest.class))).thenReturn(fakeResponse);
+
+        MensajeResponse result = monitor.informMuerteHormiguero(42);
+
+        assertNotNull(result);
+        assertEquals("RESP-321", result.getId());
+
+        ArgumentCaptor<MensajeRequest> captor = ArgumentCaptor.forClass(MensajeRequest.class);
+        verify(comm, times(1)).enviarMensaje(captor.capture());
+
+        MensajeRequest sent = captor.getValue();
+        assertEquals("S05_DEF", sent.getEmisor());
+        assertEquals("S03_REI", sent.getReceptor());
+
+        Map<String, Object> contenido = sent.getContenido();
+        assertEquals("fin_hormiguero", contenido.get("tipo"));
+
+        Map<String, Object> inner = (Map<String, Object>) contenido.get("contenido");
+        assertEquals(42, inner.get("threat_id"));
+    }
+
 }
 
