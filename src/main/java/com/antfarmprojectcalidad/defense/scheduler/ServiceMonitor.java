@@ -22,6 +22,9 @@ public class ServiceMonitor {
     private final ExternalService externalService;
     private final CommunicationService communicationService;
 
+    //for testing
+    private List<String> processedTypes = new ArrayList<>();
+
     public ServiceMonitor(ExternalService externalService, CommunicationService communicationService) {
         this.externalService = externalService;
         this.communicationService = communicationService;
@@ -46,32 +49,8 @@ public class ServiceMonitor {
     }
 
     public void checkIncomingMessages() {
-        List<MensajeResponse> mensajes = communicationService.obtenerMensaje("S05_DEF");
-        if (mensajes == null || mensajes.isEmpty()) return;
 
-        for (MensajeResponse msg : mensajes) {
-            try {
-                String json = msg.getMensaje();
-                if (json == null || json.isBlank()) continue;
-
-                ObjectMapper mapper = new ObjectMapper();
-                Map<String, Object> root = mapper.readValue(json, Map.class);
-
-                String tipo = (String) root.get("tipo");
-                if (tipo == null) continue;
-
-                if (tipo.equals("asignacion_hormigas")) {
-                    Map<String, Object> contenido = (Map<String, Object>) root.get("contenido");
-                    List<Map<String, Object>> ants =
-                            (List<Map<String, Object>>) contenido.get("ants");
-                    continue;
-                }
-
-            } catch (Exception e) {
-            }
-        }
     }
-
 
     public void handleThreat(Threat threat) {
         System.out.println("Processing threat: " + threat.getId());
@@ -103,4 +82,6 @@ public class ServiceMonitor {
 
         return response;
     }
+
+    List<String> getProcessedTypesForTest() { return processedTypes; }
 }

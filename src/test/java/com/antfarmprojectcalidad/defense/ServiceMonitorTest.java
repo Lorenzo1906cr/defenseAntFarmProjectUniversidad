@@ -126,38 +126,18 @@ public class ServiceMonitorTest {
     }
 
     @Test
-    void testCheckIncomingMessages_NoMessages() {
-        ServiceMonitor monitor = new ServiceMonitor(externalService, communicationService);
+    void checkIncomingMessages_callsCommunicationService() {
+        ExternalService external = mock(ExternalService.class);
+        CommunicationService comm = mock(CommunicationService.class);
 
-        when(communicationService.obtenerMensaje("S05_DEF"))
-                .thenReturn(Collections.emptyList());
+        ServiceMonitor monitor = new ServiceMonitor(external, comm);
 
-        assertDoesNotThrow(() -> monitor.checkIncomingMessages());
-    }
+        when(comm.obtenerMensaje("S05_DEF"))
+                .thenReturn(Collections.emptyList()); // avoid null
 
-    @Test
-    void testCheckIncomingMessages_AssignAntsMessage() throws Exception {
-        ServiceMonitor monitor = new ServiceMonitor(externalService, communicationService);
+        monitor.checkIncomingMessages();
 
-        String json = """
-        {
-          "tipo": "asignacion_hormigas",
-          "contenido": {
-            "request_ref": 1,
-            "ants": [
-              {"id": 10},
-              {"id": 20}
-            ]
-          }
-        }
-        """;
-
-        MensajeResponse msg = new MensajeResponse();
-        msg.setMensaje(json);
-
-        when(communicationService.obtenerMensaje("S05_DEF"))
-                .thenReturn(List.of(msg));
-
-        assertDoesNotThrow(() -> monitor.checkIncomingMessages());
+        verify(comm, times(1)).obtenerMensaje("S05_DEF"); // Fails at first
     }
 }
+
