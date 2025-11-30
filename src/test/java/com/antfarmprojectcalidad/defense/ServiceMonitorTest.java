@@ -146,4 +146,38 @@ public class ServiceMonitorTest {
         verify(handler, never()).handleUnknown(any(), any());
     }
 
+    @Test
+    void checkIncomingMessages_asignacion_callsHandlerAsignacion() throws Exception {
+        CommunicationService cs = mock(CommunicationService.class);
+        ExternalService es = mock(ExternalService.class);
+        MessageHandler handler = mock(MessageHandler.class);
+
+        String json = """
+        {
+          "tipo": "asignacion_hormigas",
+          "contenido": {
+            "request_ref": "ABC",
+            "ants": [
+              { "id": "1" },
+              { "id": "2" }
+            ]
+          }
+        }
+        """;
+
+        MensajeResponse mr = new MensajeResponse();
+        mr.setMensaje(json);
+
+        when(cs.obtenerMensaje("S05_DEF")).thenReturn(List.of(mr));
+
+        ServiceMonitor monitor = new ServiceMonitor(es, cs, handler);
+
+        monitor.checkIncomingMessages();
+
+        verify(handler).handleAsignacion(argThat(c ->
+                "ABC".equals(c.get("request_ref"))
+        ));
+        verify(handler, never()).handleRechazo(any());
+        verify(handler, never()).handleUnknown(any(), any());
+    }
 }
