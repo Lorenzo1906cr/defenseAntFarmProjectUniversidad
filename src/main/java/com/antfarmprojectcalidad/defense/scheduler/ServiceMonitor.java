@@ -5,6 +5,7 @@ import com.antfarmprojectcalidad.defense.model.MensajeResponse;
 import com.antfarmprojectcalidad.defense.model.Threat;
 import com.antfarmprojectcalidad.defense.service.CommunicationService;
 import com.antfarmprojectcalidad.defense.service.ExternalService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -20,10 +21,12 @@ public class ServiceMonitor {
 
     private final ExternalService externalService;
     private final CommunicationService communicationService;
+    private final MessageHandler handler;
 
-    public ServiceMonitor(ExternalService externalService, CommunicationService communicationService) {
+    public ServiceMonitor(ExternalService externalService, CommunicationService communicationService, MessageHandler handler) {
         this.externalService = externalService;
         this.communicationService = communicationService;
+        this.handler = handler;
     }
 
     // Runs every 10 seconds
@@ -37,11 +40,6 @@ public class ServiceMonitor {
                 handleThreat(threat);
                 threats.put(threat.getId(), threat);
             }
-
-
-            //System.out.println("Processing threat outside: " + threat.getId());
-            //Thread thread = createThread(threat);
-            //thread.start();
         }
 
         if (!threats.isEmpty()) {
@@ -49,8 +47,11 @@ public class ServiceMonitor {
         }
     }
 
-    public Thread createThread(Threat threat) {
-        return new Thread(() -> handleThreat(threat));
+    public void checkIncomingMessages() {
+        List<MensajeResponse> mensajes = communicationService.obtenerMensaje("S05_DEF");
+        if (mensajes == null || mensajes.isEmpty()) {
+            return;
+        }
     }
 
     public void handleThreat(Threat threat) {
