@@ -189,5 +189,26 @@ public class ServiceMonitorTest {
                 monitor.getProcessedTypesForTest()
         );
     }
+
+    @Test
+    void checkIncomingMessages_skipsEmptyMessages() {
+        ExternalService external = mock(ExternalService.class);
+        CommunicationService comm = mock(CommunicationService.class);
+
+        ServiceMonitor monitor = spy(new ServiceMonitor(external, comm));
+
+        MensajeResponse msg = new MensajeResponse();
+        msg.setMensaje("   ");
+
+        when(comm.obtenerMensaje("S05_DEF")).thenReturn(List.of(msg));
+
+        monitor.checkIncomingMessages();
+
+        assertTrue(
+                monitor.getProcessedTypesForTest().isEmpty(),
+                "Empty messages must be skipped"
+        );
+    }
+
 }
 
