@@ -139,5 +139,33 @@ public class ServiceMonitorTest {
 
         verify(comm, times(1)).obtenerMensaje("S05_DEF"); // Fails at first
     }
+
+    @Test
+    void checkIncomingMessages_processesAsignacionMessage() throws Exception {
+        ExternalService external = mock(ExternalService.class);
+        CommunicationService comm = mock(CommunicationService.class);
+
+        ServiceMonitor monitor = spy(new ServiceMonitor(external, comm));
+
+        // fake JSON message
+        MensajeResponse msg = new MensajeResponse();
+        msg.setMensaje("""
+            { "tipo": "asignacion_hormigas",
+              "contenido": {
+                   "request_ref": "req-1",
+                   "ants": [ {"id":"A-1"} ]
+              }}
+            """);
+
+        when(comm.obtenerMensaje("S05_DEF")).thenReturn(List.of(msg));
+
+        monitor.checkIncomingMessages();
+
+        assertEquals(
+                List.of("asignacion_hormigas"),
+                monitor.getProcessedTypesForTest()
+        );
+    }
+
 }
 
