@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -22,17 +23,24 @@ public class ServiceMonitorTest {
     private ExternalService externalService;
     private CommunicationService communicationService;
     private ServiceMonitor serviceMonitor;
+    private TestableServiceMonitor monitor;
 
     @BeforeEach
     void setUp() {
         externalService = mock(ExternalService.class);
         communicationService = mock(CommunicationService.class);
 
+        serviceMonitor = new ServiceMonitor(externalService, communicationService);
+
+        monitor = new TestableServiceMonitor(externalService, communicationService);
+        monitor.minutes = Duration.ofMinutes(5);
+
         ServiceMonitor.antFarmInDanger.set(false);
         ServiceMonitor.threats.clear();
         ServiceMonitor.threatsWaitingForAnts.clear();
-
-        serviceMonitor = new ServiceMonitor(externalService, communicationService);
+        ServiceMonitor.threatsDefending.clear();
+        ServiceMonitor.antsDefending.clear();
+        ServiceMonitor.threatRefDictionary.clear();
     }
 
     @Test
@@ -243,5 +251,47 @@ public class ServiceMonitorTest {
         assertTrue(types.contains("asignacion_hormigas"));
     }
 
+    @Test
+    void testDefenseExpiredTriggersAction() {
+        Threat threat = new Threat();
+        threat.setId(100);
+
+        ServiceMonitor.threats.put(100, threat);
+        ServiceMonitor.antsDefending.put(100, List.of(Map.of("id", "A-1")));
+
+        Instant tenMinutesAgo = Instant.now().minus(Duration.ofMinutes(10));
+        ServiceMonitor.threatsDefending.put(100, tenMinutesAgo);
+
+        monitor.checkForDefenses();
+        assert monitor.lastExpiredThreatId == 100;
+    }
+
+    @Test
+    void testDefenseNotExpiredDoesNotTriggerAction() {
+        Threat threat = new Threat();
+        threat.setId(200);
+
+        ServiceMonitor.threats.put(200, threat);
+        ServiceMonitor.antsDefending.put(200, List.of(Map.of("id", "A-1")));
+
+        Instant oneMinuteAgo = Instant.now().minus(Duration.ofMinutes(1));
+        ServiceMonitor.threatsDefending.put(200, oneMinuteAgo);
+
+        monitor.checkForDefenses();
+        assert monitor.lastExpiredThreatId == null;
+    }
+
+    private static class TestableServiceMonitor extends ServiceMonitor {
+        public Integer lastExpiredThreatId = null;
+
+        public TestableServiceMonitor(ExternalService e, CommunicationService c) {
+            super(e, c);
+        }
+
+        @Override
+        protected void onDefenseExpired(Integer threatId, Threat threat, List<Map<String, Object>> ants) {
+            lastExpiredThreatId = threatId;
+        }
+    }
 }
 
