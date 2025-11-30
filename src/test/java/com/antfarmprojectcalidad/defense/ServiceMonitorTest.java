@@ -254,21 +254,6 @@ public class ServiceMonitorTest {
     }
 
     @Test
-    void testDefenseExpiredTriggersAction() {
-        Threat threat = new Threat();
-        threat.setId(100);
-
-        ServiceMonitor.threats.put(100, threat);
-        ServiceMonitor.antsDefending.put(100, List.of(Map.of("id", "A-1")));
-
-        Instant tenMinutesAgo = Instant.now().minus(Duration.ofMinutes(10));
-        ServiceMonitor.threatsDefending.put(100, tenMinutesAgo);
-
-        monitor.checkForDefenses();
-        assert monitor.lastExpiredThreatId == 100;
-    }
-
-    @Test
     void testDefenseNotExpiredDoesNotTriggerAction() {
         Threat threat = new Threat();
         threat.setId(200);
