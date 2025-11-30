@@ -54,6 +54,11 @@ public class ServiceMonitor {
         List<MensajeResponse> mensajes = communicationService.obtenerMensaje("S05_DEF");
         for (MensajeResponse msg : mensajes) {
             String json = msg.getMensaje();
+
+            if (json == null || json.isBlank()) {
+                continue;
+            }
+
             Map root = null;
             try {
                 root = new ObjectMapper().readValue(json, Map.class);
