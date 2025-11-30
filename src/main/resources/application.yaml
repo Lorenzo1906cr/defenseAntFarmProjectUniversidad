@@ -6,3 +6,5 @@ url:
   threats: 'https://proyecto-final-entorno.onrender.com/threats'
  comm:
   message: 'https://proyecto-final-entorno.onrender.com/threats'
+monitor:
+  minutes: 5m
