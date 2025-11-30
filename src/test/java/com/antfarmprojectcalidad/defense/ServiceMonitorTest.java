@@ -134,4 +134,30 @@ public class ServiceMonitorTest {
 
         assertDoesNotThrow(() -> monitor.checkIncomingMessages());
     }
+
+    @Test
+    void testCheckIncomingMessages_AssignAntsMessage() throws Exception {
+        ServiceMonitor monitor = new ServiceMonitor(externalService, communicationService);
+
+        String json = """
+        {
+          "tipo": "asignacion_hormigas",
+          "contenido": {
+            "request_ref": 1,
+            "ants": [
+              {"id": 10},
+              {"id": 20}
+            ]
+          }
+        }
+        """;
+
+        MensajeResponse msg = new MensajeResponse();
+        msg.setMensaje(json);
+
+        when(communicationService.obtenerMensaje("S05_DEF"))
+                .thenReturn(List.of(msg));
+
+        assertDoesNotThrow(() -> monitor.checkIncomingMessages());
+    }
 }
