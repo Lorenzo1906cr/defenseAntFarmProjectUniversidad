@@ -210,5 +210,22 @@ public class ServiceMonitorTest {
         );
     }
 
+    @Test
+    void checkIncomingMessages_skipsInvalidJson() {
+        ExternalService external = mock(ExternalService.class);
+        CommunicationService comm = mock(CommunicationService.class);
+
+        ServiceMonitor monitor = spy(new ServiceMonitor(external, comm));
+
+        MensajeResponse msg = new MensajeResponse();
+        msg.setMensaje("{ invalid json ");
+
+        when(comm.obtenerMensaje("S05_DEF")).thenReturn(List.of(msg));
+
+        monitor.checkIncomingMessages();
+
+        assertTrue(monitor.getProcessedTypesForTest().isEmpty());
+    }
+
 }
 

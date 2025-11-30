@@ -49,33 +49,39 @@ public class ServiceMonitor {
         }
     }
 
+    // Runs every 10 seconds
+    @Scheduled(fixedRate = 10000)
     public void checkIncomingMessages() {
         processedTypes.clear();
+
         List<MensajeResponse> mensajes = communicationService.obtenerMensaje("S05_DEF");
+        if (mensajes == null || mensajes.isEmpty()) return;
+
+        ObjectMapper mapper = new ObjectMapper();
+
         for (MensajeResponse msg : mensajes) {
             String json = msg.getMensaje();
+            if (json == null || json.isBlank()) continue;
 
-            if (json == null || json.isBlank()) {
-                continue;
-            }
-
-            Map root = null;
             try {
-                root = new ObjectMapper().readValue(json, Map.class);
-                processedTypes.add((String) root.get("tipo"));
-
+                Map<String, Object> root = mapper.readValue(json, Map.class);
                 String tipo = (String) root.get("tipo");
-                if ("asignacion_hormigas".equals(tipo)) {
+                Map<String, Object> contenido = (Map<String, Object>) root.get("contenido");
+
+                if (tipo == null) continue;
+
+                if (tipo.equals("asignacion_hormigas")) {
                     processedTypes.add("asignacion_hormigas");
                     continue;
                 }
 
-                if ("rechazo_hormigas".equals(tipo)) {
+                if (tipo.equals("rechazo_hormigas")) {
                     processedTypes.add("rechazo_hormigas");
                     continue;
                 }
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+
+            } catch (Exception e) {
+                // Invalid JSON is ignored
             }
         }
     }
