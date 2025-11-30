@@ -33,7 +33,6 @@ public class ServiceMonitorTest {
         serviceMonitor = new ServiceMonitor(externalService, communicationService);
 
         monitor = new TestableServiceMonitor(externalService, communicationService);
-        monitor.minutes = Duration.ofMinutes(5);
 
         ServiceMonitor.antFarmInDanger.set(false);
         ServiceMonitor.threats.clear();
