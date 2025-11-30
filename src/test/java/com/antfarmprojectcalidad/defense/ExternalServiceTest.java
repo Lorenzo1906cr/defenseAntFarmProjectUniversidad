@@ -109,4 +109,33 @@ class ExternalServiceTest {
         assertNotNull(threats);
         assertTrue(threats.isEmpty());
     }
+
+    @Test
+    void deactivateThreat_returnsTrue_onSuccess() throws Exception {
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .addHeader("Content-Type", "application/json"));
+
+        boolean result = externalService.deactivateThreat(123);
+
+        assertTrue(result);
+
+        // Verify the request
+        var recorded = mockWebServer.takeRequest();
+        assertEquals("PUT", recorded.getMethod());
+        assertEquals("/123", recorded.getPath());  // baseUrl ends with "/"
+        assertEquals("{\"estado\":\"inactiva\"}", recorded.getBody().readUtf8());
+    }
+
+    @Test
+    void deactivateThreat_returnsFalse_onServerError() {
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .addHeader("Content-Type", "application/json"));
+
+        boolean result = externalService.deactivateThreat(999);
+
+        assertFalse(result);
+    }
+
 }
