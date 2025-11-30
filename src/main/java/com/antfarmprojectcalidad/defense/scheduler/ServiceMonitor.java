@@ -21,12 +21,10 @@ public class ServiceMonitor {
 
     private final ExternalService externalService;
     private final CommunicationService communicationService;
-    private final MessageHandler handler;
 
-    public ServiceMonitor(ExternalService externalService, CommunicationService communicationService, MessageHandler handler) {
+    public ServiceMonitor(ExternalService externalService, CommunicationService communicationService) {
         this.externalService = externalService;
         this.communicationService = communicationService;
-        this.handler = handler;
     }
 
     // Runs every 10 seconds
@@ -45,30 +43,6 @@ public class ServiceMonitor {
         if (!threats.isEmpty()) {
             antFarmInDanger.set(true);
         }
-    }
-
-    public void checkIncomingMessages() {
-        List<MensajeResponse> mensajes = communicationService.obtenerMensaje("S05_DEF");
-        if (mensajes == null || mensajes.isEmpty()) {
-            return;
-        }
-
-        for (MensajeResponse msg : mensajes) {
-            try {
-                Map<String,Object> root =
-                        new ObjectMapper().readValue(msg.getMensaje(), Map.class);
-
-                String tipo = (String) root.get("tipo");
-                Map<String,Object> contenido = (Map<String,Object>) root.get("contenido");
-
-                if ("asignacion_hormigas".equals(tipo)) {
-                    handler.handleAsignacion(contenido);
-                    continue;
-                }
-
-            } catch (Exception ignored) {}
-        }
-
     }
 
     public void handleThreat(Threat threat) {

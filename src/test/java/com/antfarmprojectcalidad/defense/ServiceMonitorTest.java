@@ -3,7 +3,6 @@ package com.antfarmprojectcalidad.defense;
 import com.antfarmprojectcalidad.defense.model.MensajeRequest;
 import com.antfarmprojectcalidad.defense.model.MensajeResponse;
 import com.antfarmprojectcalidad.defense.model.Threat;
-import com.antfarmprojectcalidad.defense.scheduler.MessageHandler;
 import com.antfarmprojectcalidad.defense.scheduler.ServiceMonitor;
 import com.antfarmprojectcalidad.defense.service.CommunicationService;
 import com.antfarmprojectcalidad.defense.service.ExternalService;
@@ -27,13 +26,12 @@ public class ServiceMonitorTest {
     void setUp() {
         externalService = mock(ExternalService.class);
         communicationService = mock(CommunicationService.class);
-        MessageHandler handler = mock(MessageHandler.class);
 
         ServiceMonitor.antFarmInDanger.set(false);
         ServiceMonitor.threats.clear();
         ServiceMonitor.threatsWaitingForAnts.clear();
 
-        serviceMonitor = new ServiceMonitor(externalService, communicationService, handler);
+        serviceMonitor = new ServiceMonitor(externalService, communicationService);
     }
 
     @Test
@@ -67,9 +65,8 @@ public class ServiceMonitorTest {
     void testRequestSupport() {
         ExternalService externalService = mock(ExternalService.class);
         CommunicationService communicationService = mock(CommunicationService.class);
-        MessageHandler handler = mock(MessageHandler.class);
 
-        ServiceMonitor monitor = new ServiceMonitor(externalService, communicationService, handler);
+        ServiceMonitor monitor = new ServiceMonitor(externalService, communicationService);
 
         Threat threat = mock(Threat.class);
         when(threat.getId()).thenReturn(123);
@@ -126,58 +123,5 @@ public class ServiceMonitorTest {
         assertEquals(1, ServiceMonitor.threatsWaitingForAnts.size(), "threatsWaitingForAnts must contain the threat");
 
         verify(communicationService, times(1)).enviarMensaje(any());
-    }
-
-    @Test
-    void checkIncomingMessages_noMessages_handlerNotCalled() {
-        CommunicationService cs = mock(CommunicationService.class);
-        ExternalService es = mock(ExternalService.class);
-        MessageHandler handler = mock(MessageHandler.class);
-
-        when(cs.obtenerMensaje("S05_DEF"))
-                .thenReturn(List.of());
-
-        ServiceMonitor monitor = new ServiceMonitor(es, cs, handler);
-
-        monitor.checkIncomingMessages();
-
-        verify(handler, never()).handleAsignacion(any());
-        verify(handler, never()).handleRechazo(any());
-        verify(handler, never()).handleUnknown(any(), any());
-    }
-
-    @Test
-    void checkIncomingMessages_asignacion_callsHandlerAsignacion() throws Exception {
-        CommunicationService cs = mock(CommunicationService.class);
-        ExternalService es = mock(ExternalService.class);
-        MessageHandler handler = mock(MessageHandler.class);
-
-        String json = """
-        {
-          "tipo": "asignacion_hormigas",
-          "contenido": {
-            "request_ref": "ABC",
-            "ants": [
-              { "id": "1" },
-              { "id": "2" }
-            ]
-          }
-        }
-        """;
-
-        MensajeResponse mr = new MensajeResponse();
-        mr.setMensaje(json);
-
-        when(cs.obtenerMensaje("S05_DEF")).thenReturn(List.of(mr));
-
-        ServiceMonitor monitor = new ServiceMonitor(es, cs, handler);
-
-        monitor.checkIncomingMessages();
-
-        verify(handler).handleAsignacion(argThat(c ->
-                "ABC".equals(c.get("request_ref"))
-        ));
-        verify(handler, never()).handleRechazo(any());
-        verify(handler, never()).handleUnknown(any(), any());
     }
 }
