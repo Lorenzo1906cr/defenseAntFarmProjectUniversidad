@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,7 @@ public class ServiceMonitorTest {
         when(communicationService.enviarMensaje(any(MensajeRequest.class)))
                 .thenReturn(fakeResponse);
 
-        MensajeResponse result = monitor.requestSupport(threat);
+        MensajeResponse result = monitor.requestSupport(threat, "req-123456");
 
         assertNotNull(result);
         assertEquals("RESP-555", result.getId());
@@ -96,7 +97,7 @@ public class ServiceMonitorTest {
         Map<String, Object> inner = (Map<String, Object>) contenido.get("contenido");
         assertNotNull(inner);
 
-        assertEquals(1, inner.get("request_ref"));
+        assertEquals("req-123456", inner.get("request_ref"));
         assertEquals(123, inner.get("threat_id"));
         assertEquals("5", inner.get("ants_needed"));
     }
@@ -225,6 +226,21 @@ public class ServiceMonitorTest {
         monitor.checkIncomingMessages();
 
         assertTrue(monitor.getProcessedTypesForTest().isEmpty());
+    }
+
+    @Test
+    void testStartDefenseUpdatesThreatsDefending() {
+        MensajeResponse msg = new MensajeResponse();
+        msg.setMensaje("{\"tipo\":\"asignacion_hormigas\",\"contenido\":{\"request_ref\":\"req-123456\",\"ants\":[{\"id\":\"A-1\"},{\"id\":\"A-2\"}]}}");
+
+        when(communicationService.obtenerMensaje("S05_DEF")).thenReturn(Collections.singletonList(msg));
+
+        serviceMonitor.threatRefDictionary.put(42, "req-123456");
+
+        serviceMonitor.checkIncomingMessages();
+
+        List<String> types = serviceMonitor.getProcessedTypesForTest();
+        assertTrue(types.contains("asignacion_hormigas"));
     }
 
 }
