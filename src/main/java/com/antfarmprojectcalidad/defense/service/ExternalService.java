@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ExternalService {
@@ -41,6 +42,28 @@ public class ExternalService {
                     .block();
         } catch (Exception e) {
             return Collections.emptyList();
+        }
+    }
+
+    public boolean deactivateThreat(int threatId) {
+        try {
+            String url = entornoUrl + "/" + threatId;
+            Map<String, String> body = Collections.singletonMap("estado", "inactiva");
+
+            webClient.put()
+                    .uri(url)
+                    .bodyValue(body)
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::isError,
+                            response -> Mono.error(new RuntimeException("API error"))
+                    )
+                    .bodyToMono(Void.class)
+                    .block();
+
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
