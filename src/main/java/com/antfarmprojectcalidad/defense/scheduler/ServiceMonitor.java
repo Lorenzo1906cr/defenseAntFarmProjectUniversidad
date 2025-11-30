@@ -5,6 +5,7 @@ import com.antfarmprojectcalidad.defense.model.MensajeResponse;
 import com.antfarmprojectcalidad.defense.model.Threat;
 import com.antfarmprojectcalidad.defense.service.CommunicationService;
 import com.antfarmprojectcalidad.defense.service.ExternalService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -49,7 +50,18 @@ public class ServiceMonitor {
     }
 
     public void checkIncomingMessages() {
-
+        processedTypes.clear();
+        List<MensajeResponse> mensajes = communicationService.obtenerMensaje("S05_DEF");
+        for (MensajeResponse msg : mensajes) {
+            String json = msg.getMensaje();
+            Map root = null;
+            try {
+                root = new ObjectMapper().readValue(json, Map.class);
+                processedTypes.add((String) root.get("tipo"));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void handleThreat(Threat threat) {
