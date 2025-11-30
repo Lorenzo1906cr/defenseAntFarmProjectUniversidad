@@ -124,4 +124,14 @@ public class ServiceMonitorTest {
 
         verify(communicationService, times(1)).enviarMensaje(any());
     }
+
+    @Test
+    void testCheckIncomingMessages_NoMessages() {
+        ServiceMonitor monitor = new ServiceMonitor(externalService, communicationService);
+
+        when(communicationService.obtenerMensaje("S05_DEF"))
+                .thenReturn(Collections.emptyList());
+
+        assertDoesNotThrow(() -> monitor.checkIncomingMessages());
+    }
 }
