@@ -6,9 +6,11 @@ import com.antfarmprojectcalidad.defense.model.Threat;
 import com.antfarmprojectcalidad.defense.service.CommunicationService;
 import com.antfarmprojectcalidad.defense.service.ExternalService;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,11 +20,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class ServiceMonitor {
+    @Value("${monitor.minutes}")
+    public Duration minutes;
+
     public static final AtomicBoolean antFarmInDanger = new AtomicBoolean(false);
     public static final Map<Integer, Threat> threats = new ConcurrentHashMap<>();
     public static final Map<Integer, Threat> threatsWaitingForAnts = new ConcurrentHashMap<>();
     public static final Map<Object, Object> threatRefDictionary = new ConcurrentHashMap<>();
     public static final Map<Integer, Instant> threatsDefending = new ConcurrentHashMap<>();
+    public static final Map<Integer, Object> antsDefending = new ConcurrentHashMap<>();
 
     private final ExternalService externalService;
     private final CommunicationService communicationService;
@@ -81,7 +87,8 @@ public class ServiceMonitor {
 
                 if (tipo.equals("asignacion_hormigas")) {
                     processedTypes.add("asignacion_hormigas");
-                    startDefense(requestId);
+                    List<Map<String, Object>> ants = (List<Map<String, Object>>) contenido.get("ants");
+                    startDefense(requestId, ants);
                     continue;
                 }
 
@@ -96,9 +103,28 @@ public class ServiceMonitor {
         }
     }
 
-    private void startDefense(String requestId) {
+    // Runs every 10 seconds
+    @Scheduled(fixedRate = 10000)
+    public void checkForDefenses() {
+        for (Map.Entry<Integer, Instant> entry : threatsDefending.entrySet()) {
+            Integer id = entry.getKey();
+            Instant time = entry.getValue();
+
+            if (time != null && time.isBefore(Instant.now().minus(minutes))) {
+                Threat threat = threats.get(id);
+                List<Map<String, Object>> ants = (List<Map<String, Object>>) antsDefending.get(id);
+
+                //Send message to entorno
+                //Send message to hormiga reina
+                onDefenseExpired(id, threat, ants);
+            }
+        }
+    }
+
+    private void startDefense(String requestId, List<Map<String, Object>> ants) {
         Integer threatId = (Integer) threatRefDictionary.get(requestId);
         threatsDefending.put(threatId, Instant.now());
+        antsDefending.put(threatId, ants);
     }
 
     private void startDying(String requestId) {
@@ -136,5 +162,7 @@ public class ServiceMonitor {
         return response;
     }
 
+    protected void onDefenseExpired(Integer threatId, Threat threat, List<Map<String, Object>> ants) {
+    }
     public List<String> getProcessedTypesForTest() { return processedTypes; }
 }
