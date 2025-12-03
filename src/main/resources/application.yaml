@@ -5,6 +5,6 @@ url:
  entorno:
   threats: 'https://proyecto-final-entorno.onrender.com/threats'
  comm:
-  message: 'https://proyecto-final-entorno.onrender.com/threats'
+  message: 'https://communicationservice-production.up.railway.app'
 monitor:
   minutes: 5m

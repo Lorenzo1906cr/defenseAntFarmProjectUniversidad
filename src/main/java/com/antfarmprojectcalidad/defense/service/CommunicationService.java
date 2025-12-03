@@ -29,7 +29,7 @@ public class CommunicationService {
     public MensajeResponse enviarMensaje(MensajeRequest request) {
         try {
             return webClient.post()
-                    .uri(commUrl)
+                    .uri(commUrl  + "/api/mensaje")
                     .bodyValue(request)
                     .retrieve()
                     .onStatus(
