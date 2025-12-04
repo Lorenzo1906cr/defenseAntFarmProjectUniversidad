@@ -26,7 +26,7 @@ public class CommunicationServiceTest {
 
     private CommunicationService communicationService;
 
-    private final String URL = "http://localhost:8080/api/mensaje";
+    private final String URL = "http://localhost:8080";
 
     @BeforeEach
     void setup() {
@@ -37,7 +37,7 @@ public class CommunicationServiceTest {
         responseSpec = mock(WebClient.ResponseSpec.class);
 
         when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(URL)).thenReturn(requestBodySpec);
+        when(requestBodyUriSpec.uri(URL + "/api/mensaje")).thenReturn(requestBodySpec);
         when(requestBodySpec.bodyValue(any())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
@@ -48,7 +48,8 @@ public class CommunicationServiceTest {
         mockResponse.setTtl(60000);
 
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(MensajeResponse.class)).thenReturn(Mono.just(mockResponse));
+        when(responseSpec.bodyToMono(MensajeResponse.class))
+                .thenReturn(Mono.just(mockResponse));
 
         communicationService = new CommunicationService(URL, webClient);
     }
@@ -68,7 +69,7 @@ public class CommunicationServiceTest {
         assertEquals(60000, response.getTtl());
 
         verify(webClient).post();
-        verify(requestBodyUriSpec).uri(URL);
+        verify(requestBodyUriSpec).uri(contains("/api/mensaje"));
         verify(requestBodySpec).bodyValue(request);
         verify(requestHeadersSpec).retrieve();
         verify(responseSpec).bodyToMono(MensajeResponse.class);
